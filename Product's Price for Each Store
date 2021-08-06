@@ -1,0 +1,51 @@
+WITH T0 AS (SELECT DISTINCT product_id
+            FROM Products),
+     T1 AS (SELECT product_id,
+                   price AS price1
+            FROM Products
+            WHERE store='store1'),
+     T2 AS (SELECT product_id,
+                   price AS price2
+            FROM Products
+            WHERE store='store2'),
+     T3 AS (SELECT product_id,
+                   price AS price3
+            FROM Products
+            WHERE store='store3')
+
+SELECT T0.product_id,
+       T1.price1 AS store1,
+       T2.price2 AS store2,
+       T3.price3 AS store3
+FROM T0
+LEFT JOIN T1
+ON T0.product_id=T1.product_id
+LEFT JOIN T2
+ON T0.product_id=T2.product_id
+LEFT JOIN T3
+ON T0.product_id=T3.product_id
+ORDER BY product_id
+
+
+/////////////////
+Hard Code Pivot Table
+
+SELECT *
+FROM (
+       SELECT product_id,store,price FROM Products
+     )T1
+PIVOT
+(MAX(price) FOR store IN (
+                           [store1],
+                           [store2],
+                           [store3]
+                         ) 
+)T2
+Naive CASE WHEN
+
+SELECT
+  product_id,
+  MAX(CASE WHEN store = 'store1' THEN price END) AS store1,
+  MAX(CASE WHEN store = 'store2' THEN price END) AS store2,
+  MAX(CASE WHEN store = 'store3' THEN price END) AS store3
+FROM Products GROUP BY product_id
